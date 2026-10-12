@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- GRAPH: default visual, bar chart of most rented products -->
+    <record id="view_rental_analysis_graph" model="ir.ui.view">
+        <field name="name">rental.analysis.report.graph</field>
+        <field name="model">rental.analysis.report</field>
+        <field name="arch" type="xml">
+            <graph string="Most Rented Products" type="bar" sample="1">
+                <field name="product_id"/>
+                <field name="total_qty" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- PIVOT: cross-tabulate product vs time -->
+    <record id="view_rental_analysis_pivot" model="ir.ui.view">
+        <field name="name">rental.analysis.report.pivot</field>
+        <field name="model">rental.analysis.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Most Rented Products" sample="1">
+                <field name="date" interval="month" type="row"/>
+                <field name="product_id" type="row"/>
+                <field name="total_qty" type="measure"/>
+                <field name="order_count" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- LIST: ranked table -->
+    <record id="view_rental_analysis_list" model="ir.ui.view">
+        <field name="name">rental.analysis.report.list</field>
+        <field name="model">rental.analysis.report</field>
+        <field name="arch" type="xml">
+            <list string="Most Rented Products" create="0" edit="0" delete="0">
+                <field name="product_id"/>
+                <field name="categ_id" optional="show"/>
+                <field name="partner_id" optional="hide"/>
+                <field name="date" optional="hide"/>
+                <field name="total_qty" sum="Total Quantity"/>
+                <field name="order_count" sum="Total Rental Lines"/>
+                <field name="state" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- CALENDAR: browse month by month with the arrows (attendance-style) -->
+    <record id="view_rental_analysis_calendar" model="ir.ui.view">
+        <field name="name">rental.analysis.report.calendar</field>
+        <field name="model">rental.analysis.report</field>
+        <field name="arch" type="xml">
+            <calendar string="Rentals by Month" date_start="date" color="product_id"
+                      mode="month" create="0" event_open_popup="1">
+                <field name="product_id"/>
+                <field name="partner_id"/>
+                <field name="total_qty"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- SEARCH: time filters + group by -->
+    <record id="view_rental_analysis_search" model="ir.ui.view">
+        <field name="name">rental.analysis.report.search</field>
+        <field name="model">rental.analysis.report</field>
+        <field name="arch" type="xml">
+            <search string="Most Rented Products">
+                <field name="product_id"/>
+                <field name="categ_id"/>
+                <field name="partner_id"/>
+                <filter name="confirmed" string="Confirmed Only" domain="[('state', '=', 'sale')]"/>
+                <filter name="this_month" string="This Month" domain="[('date', '&gt;=', time.strftime('%Y-%m-01'))]"/>
+                <filter name="this_year" string="This Year" domain="[('date', '&gt;=', time.strftime('%Y-01-01'))]"/>
+                <filter name="group_product" string="Product" context="{'group_by': 'product_id'}"/>
+                <filter name="group_category" string="Product Category" context="{'group_by': 'categ_id'}"/>
+                <filter name="group_customer" string="Customer" context="{'group_by': 'partner_id'}"/>
+                <filter name="group_month" string="Rental Month" context="{'group_by': 'date:month'}"/>
+                <filter name="group_year" string="Rental Year" context="{'group_by': 'date:year'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ACTION -->
+    <record id="action_rental_analysis_report" model="ir.actions.act_window">
+        <field name="name">Most Rented Products</field>
+        <field name="res_model">rental.analysis.report</field>
+        <field name="view_mode">graph,pivot,calendar,list</field>
+        <field name="search_view_id" ref="view_rental_analysis_search"/>
+        <field name="context">{
+            'search_default_confirmed': 1,
+            'search_default_group_product': 1,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No rental data yet
+            </p>
+            <p>
+                Once you confirm rental orders in the Rental app, this screen
+                ranks your most rented products. Use the <b>This Month</b> and
+                <b>This Year</b> filters, or clear them for an all-time view.
+            </p>
+        </field>
+    </record>
+
+    <!-- MENU: appears as a tab inside the Rental app -->
+    <menuitem id="menu_rental_analysis"
+              name="Most Rented"
+              parent="sale_renting.rental_menu_root"
+              action="action_rental_analysis_report"
+              sequence="50"/>
+
+</odoo>

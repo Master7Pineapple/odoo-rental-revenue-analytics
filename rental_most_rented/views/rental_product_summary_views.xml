@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_rental_product_summary_list" model="ir.ui.view">
+        <field name="name">rental.product.summary.list</field>
+        <field name="model">rental.product.summary</field>
+        <field name="arch" type="xml">
+            <list string="Rented Products Summary" create="0" edit="0" delete="0">
+                <field name="product_id"/>
+                <field name="categ_id" optional="show"/>
+                <field name="total_qty" sum="Total Quantity"/>
+                <field name="line_count" sum="Total Lines"/>
+                <field name="order_count" sum="Total Orders"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rental_product_summary_pivot" model="ir.ui.view">
+        <field name="name">rental.product.summary.pivot</field>
+        <field name="model">rental.product.summary</field>
+        <field name="arch" type="xml">
+            <pivot string="Rented Products Summary" sample="1">
+                <field name="product_id" type="row"/>
+                <field name="total_qty" type="measure"/>
+                <field name="line_count" type="measure"/>
+                <field name="order_count" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_rental_product_summary_graph" model="ir.ui.view">
+        <field name="name">rental.product.summary.graph</field>
+        <field name="model">rental.product.summary</field>
+        <field name="arch" type="xml">
+            <graph string="Rented Products Summary" type="bar" sample="1">
+                <field name="product_id"/>
+                <field name="total_qty" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_rental_product_summary_search" model="ir.ui.view">
+        <field name="name">rental.product.summary.search</field>
+        <field name="model">rental.product.summary</field>
+        <field name="arch" type="xml">
+            <search string="Rented Products Summary">
+                <field name="product_id"/>
+                <field name="categ_id"/>
+                <filter name="group_category" string="Product Category" context="{'group_by': 'categ_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_rental_product_summary" model="ir.actions.act_window">
+        <field name="name">Products Summary (Export)</field>
+        <field name="res_model">rental.product.summary</field>
+        <field name="view_mode">list,pivot,graph</field>
+        <field name="search_view_id" ref="view_rental_product_summary_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No rented products yet</p>
+            <p>Every rented product (all time) with its quantity, number of rental lines
+               and number of orders. Select all rows and use Export to download them.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_rental_product_summary"
+              name="Products Summary"
+              parent="sale_renting.rental_menu_root"
+              action="action_rental_product_summary"
+              sequence="52"/>
+
+</odoo>

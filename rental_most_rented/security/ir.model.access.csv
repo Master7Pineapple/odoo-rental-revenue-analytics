@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_rental_analysis_report_user,rental.analysis.report.user,model_rental_analysis_report,base.group_user,1,0,0,0
+access_rental_customer_report_user,rental.customer.report.user,model_rental_customer_report,base.group_user,1,0,0,0
+access_rental_product_summary_user,rental.product.summary.user,model_rental_product_summary,base.group_user,1,0,0,0

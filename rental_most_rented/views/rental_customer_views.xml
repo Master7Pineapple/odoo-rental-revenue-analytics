@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_rental_customer_graph" model="ir.ui.view">
+        <field name="name">rental.customer.report.graph</field>
+        <field name="model">rental.customer.report</field>
+        <field name="arch" type="xml">
+            <graph string="Top Customers" type="bar" sample="1">
+                <field name="partner_id"/>
+                <field name="order_count" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_rental_customer_pivot" model="ir.ui.view">
+        <field name="name">rental.customer.report.pivot</field>
+        <field name="model">rental.customer.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Top Customers" sample="1">
+                <field name="partner_id" type="row"/>
+                <field name="order_count" type="measure"/>
+                <field name="total_qty" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_rental_customer_list" model="ir.ui.view">
+        <field name="name">rental.customer.report.list</field>
+        <field name="model">rental.customer.report</field>
+        <field name="arch" type="xml">
+            <list string="Top Customers" create="0" edit="0" delete="0">
+                <field name="partner_id"/>
+                <field name="order_count" sum="Total Orders"/>
+                <field name="total_qty" sum="Total Quantity" optional="show"/>
+                <field name="date" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rental_customer_search" model="ir.ui.view">
+        <field name="name">rental.customer.report.search</field>
+        <field name="model">rental.customer.report</field>
+        <field name="arch" type="xml">
+            <search string="Top Customers">
+                <field name="partner_id"/>
+                <filter name="this_month" string="This Month" domain="[('date', '&gt;=', time.strftime('%Y-%m-01'))]"/>
+                <filter name="this_year" string="This Year" domain="[('date', '&gt;=', time.strftime('%Y-01-01'))]"/>
+                <filter name="group_customer" string="Customer" context="{'group_by': 'partner_id'}"/>
+                <filter name="group_month" string="Rental Month" context="{'group_by': 'date:month'}"/>
+                <filter name="group_year" string="Rental Year" context="{'group_by': 'date:year'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_rental_customer_report" model="ir.actions.act_window">
+        <field name="name">Top Customers</field>
+        <field name="res_model">rental.customer.report</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="search_view_id" ref="view_rental_customer_search"/>
+        <field name="context">{'search_default_group_customer': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No rental customers yet</p>
+            <p>Ranks customers by the number of confirmed rental orders they placed.
+               Select all rows and use Export to download each customer with their order count.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_rental_customer_report"
+              name="Top Customers"
+              parent="sale_renting.rental_menu_root"
+              action="action_rental_customer_report"
+              sequence="51"/>
+
+</odoo>
